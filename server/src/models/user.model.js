@@ -28,7 +28,7 @@ const userSchema = new Schema(
             unique: true,
             sparse: true,
         },
-        username: {
+        fullname: {
             type: String,
             unique: true,
             required: true,
@@ -50,7 +50,7 @@ const userSchema = new Schema(
                 function () {
                     return !this.googleID
                 },
-                'Batch is required',
+                'university id is required',
             ],
         },
         uniID: {
@@ -59,7 +59,7 @@ const userSchema = new Schema(
                 function () {
                     return !this.googleID
                 },
-                'University ID is required',
+                'university id is required',
             ],
         },
         password: {
@@ -71,19 +71,27 @@ const userSchema = new Schema(
         },
         socialLinks: {
             type: [String],
+            default: [],
         },
         roles: {
-            type: [roleSchema],
-            default: [{ role: 'member', position: 0, positionName: 'member' }],
+            type: roleSchema,
+            default: { role: 'member', position: 0, positionName: 'member' },
         },
         otp: {
             type: String,
-            required: [
-                function () {
-                    return !this.googleID
-                },
-                'OTP is required',
-            ],
+            required: function () {
+                return !this.googleID
+            },
+        },
+        otpExpires: {
+            type: Date,
+            required: function () {
+                return !this.googleID
+            },
+        },
+        valid: {
+            type: Boolean,
+            default: true,
         },
         refreshTokens: {
             type: [String],

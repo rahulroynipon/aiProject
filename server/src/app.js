@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { LIMIT } from './constants.js'
-import { generateOTP, sendOTP } from './utils/sentOtp.util.js'
+import { generateOTP, sendOTP } from './utils/sentOtp.js'
 
 const app = express()
 
@@ -20,7 +20,7 @@ app.use(cookieParser())
 
 app.get('/otp', (req, res) => {
     const otp = generateOTP()
-    sendOTP('mdsiaofficial@gmail.com', otp, 'reset')
+    sendOTP('rahulroynipon@gmail.com', otp, 'registration')
     res.status(200).send('ok')
 })
 
