@@ -2,7 +2,9 @@ import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 
 const generateOTP = () => {
-    return crypto.randomBytes(3).toString('hex')
+    const otp = crypto.randomBytes(3).toString('hex')
+    const otpExpires = new Date(Date.now() + 2 * 60 * 1000)
+    return [otp, otpExpires]
 }
 
 const sendOTP = (email, otp, purpose) => {

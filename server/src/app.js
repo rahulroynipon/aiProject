@@ -1,10 +1,9 @@
-import express from 'express'
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
-import { LIMIT } from './constants.js'
-import { generateOTP, sendOTP } from './utils/sentOtp.js'
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { LIMIT } from './constants.js';
 
-const app = express()
+const app = express();
 
 app.use(
     cors({
@@ -12,16 +11,15 @@ app.use(
         credentials: true,
         optionsSuccessStatus: 200,
     })
-)
-app.use(express.json({ limit: LIMIT }))
-app.use(express.urlencoded({ extended: true, limit: LIMIT }))
-app.use(express.static('public'))
-app.use(cookieParser())
+);
+app.use(express.json({ limit: LIMIT }));
+app.use(express.urlencoded({ extended: true, limit: LIMIT }));
+app.use(express.static('public'));
+app.use(cookieParser());
 
-app.get('/otp', (req, res) => {
-    const otp = generateOTP()
-    sendOTP('rahulroynipon@gmail.com', otp, 'registration')
-    res.status(200).send('ok')
-})
+//routes
+import userRouter from './routes/user.route.js';
 
-export { app }
+app.use('/api/v1/users', userRouter);
+
+export { app };

@@ -89,7 +89,7 @@ const userSchema = new Schema(
                 return !this.googleID
             },
         },
-        valid: {
+        isValid: {
             type: Boolean,
             default: true,
         },
