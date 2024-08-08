@@ -1,11 +1,11 @@
-import crypto from 'crypto'
-import nodemailer from 'nodemailer'
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 const generateOTP = () => {
-    const otp = crypto.randomBytes(3).toString('hex')
-    const otpExpires = new Date(Date.now() + 2 * 60 * 1000)
-    return [otp, otpExpires]
-}
+    const otp = crypto.randomBytes(3).toString('hex');
+    const otpExpires = new Date(Date.now() + 2 * 60 * 1000);
+    return [otp, otpExpires];
+};
 
 const sendOTP = (email, otp, purpose) => {
     const transporter = nodemailer.createTransport({
@@ -14,12 +14,12 @@ const sendOTP = (email, otp, purpose) => {
             user: process.env.EMAIL,
             pass: process.env.EMAIL_PASSWORD,
         },
-    })
+    });
 
-    let subject, text
+    let subject, text;
 
     if (purpose === 'registration') {
-        subject = 'Your Registration OTP Code'
+        subject = 'Your Registration OTP Code';
         text = `Dear User,
 
 Thank you for registering with us. To complete your registration, please use the following One-Time Password (OTP):
@@ -32,9 +32,10 @@ If you did not request this code, please ignore this email.
 
 Best regards,
 Competitive Programming Camp City University,
-(CPCCU)`
+(CPCCU)
+`;
     } else if (purpose === 'reset') {
-        subject = 'Your Password Reset OTP Code'
+        subject = 'Your Password Reset OTP Code';
         text = `Dear User,
 
 We received a request to reset your password. To proceed with the password reset, please use the following One-Time Password (OTP):
@@ -47,9 +48,9 @@ If you did not request a password reset, please ignore this email.
 
 Best regards,
 Competitive Programming Camp City University,
-(CPCCU)`
+(CPCCU)`;
     } else {
-        throw new Error('Invalid purpose specified for OTP email.')
+        throw new Error('Invalid purpose specified for OTP email.');
     }
 
     const mailOptions = {
@@ -57,15 +58,15 @@ Competitive Programming Camp City University,
         to: email,
         subject: subject,
         text: text,
-    }
+    };
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log(error)
+            console.log(error);
         } else {
-            console.log('Email sent: ' + info.response)
+            console.log('Email sent: ' + info.response);
         }
-    })
-}
+    });
+};
 
-export { generateOTP, sendOTP }
+export { generateOTP, sendOTP };

@@ -1,4 +1,6 @@
 import { User } from '../models/user.model.js';
+import { COOKIE_OPTIONS, MAINTENANCE_DAY } from './../constants.js';
+import jwt from 'jsonwebtoken';
 import {
     ApiError,
     ApiResponse,
@@ -97,4 +99,131 @@ const verifyOTPHandler = asyncHandler(async (req, res) => {
     }
 });
 
-export { registrationHandler, verifyOTPHandler };
+//when user login account manually
+const loginHandler = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    if ([email, password].some((field) => field?.trim() === '' || !field)) {
+        throw new ApiError(400, 'All fields are required');
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        if (!user.isValid) {
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        const isPasswordCorrect = await user.isPasswordCorrect(password);
+
+        if (!isPasswordCorrect) {
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+
+        const expires = new Date();
+        expires.setDate(expires.getDate() + MAINTENANCE_DAY);
+
+        user.refreshTokens.push({
+            token: refreshToken,
+            expires,
+        });
+        await user.save({ validateBeforeSave: false });
+
+        const loggedInUser = await User.findOne({ email }).select(
+            '-password -refreshTokens'
+        );
+
+        return res
+            .status(200)
+            .cookie('accessToken', accessToken, COOKIE_OPTIONS)
+            .cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
+            .json(new ApiResponse(200, loggedInUser, 'Login successful'));
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw new ApiError(500, 'Server error during login');
+    }
+});
+
+//secure handler
+//when user logout
+const logoutHandler = asyncHandler(async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) {
+            throw new ApiError(400, 'Refresh token not provided');
+        }
+
+        user.refreshTokens = user.refreshTokens.filter(
+            (item) => item.Token !== refreshToken
+        );
+        await user.save({ validateBeforeSave: false });
+
+        res.status(200)
+            .clearCookie('accessToken', COOKIE_OPTIONS)
+            .clearCookie('refreshToken', COOKIE_OPTIONS)
+            .json(new ApiResponse(200, {}, 'User logged out successfully'));
+    } catch (error) {
+        throw new ApiError(
+            500,
+            error.message || 'Server site error while user logout'
+        );
+    }
+});
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    try {
+        const incomingRefreshToken = req.cookies?.refreshToken;
+
+        if (!incomingRefreshToken) {
+            throw new ApiError(401, 'Unauthorized request');
+        }
+
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SCRECT
+        );
+
+        const user = await User.findById(decodedToken._id).select('-password');
+
+        if (!user) {
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        const renewToken = user.generateAccessToken();
+
+        res.status(200)
+            .cookie('accessToken', renewToken, COOKIE_OPTIONS)
+            .json(
+                new ApiResponse(
+                    200,
+                    { accessToken: renewToken },
+                    'Access token renewed successfully'
+                )
+            );
+    } catch (error) {
+        throw new ApiError(
+            500,
+            error?.message || 'Error renewing access token'
+        );
+    }
+});
+
+export {
+    registrationHandler,
+    verifyOTPHandler,
+    loginHandler,
+    logoutHandler,
+    refreshAccessToken,
+};
