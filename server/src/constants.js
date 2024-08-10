@@ -6,4 +6,6 @@ export const COOKIE_OPTIONS = {
     sameSite: 'Strict',
 };
 
-export const MAINTENANCE_DAY = 7;
+export const MAINTENANCE_DAY = 15;
+export const OTP_TIME = 2;
+export const RESET_TIME = 5;

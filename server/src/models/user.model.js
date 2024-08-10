@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { MAINTENANCE_DAY } from '../constants.js';
 
 const roleSchema = new Schema(
     {
@@ -20,6 +21,14 @@ const roleSchema = new Schema(
     },
     { _id: false }
 );
+
+const refreshTokenSchema = new Schema({
+    token: {
+        type: String,
+        unique: true,
+    },
+    expires: Date,
+});
 
 const userSchema = new Schema(
     {
@@ -45,21 +54,21 @@ const userSchema = new Schema(
         },
         batch: {
             type: String,
-            required: [
-                function () {
+            validate: {
+                validator: function () {
                     return !this.googleID;
                 },
-                'university id is required',
-            ],
+                message: 'Batch is required for non-Google users',
+            },
         },
         uniID: {
             type: String,
-            required: [
-                function () {
+            validate: {
+                validator: function () {
                     return !this.googleID;
                 },
-                'university id is required',
-            ],
+                message: 'University ID is required for non-Google users',
+            },
         },
         password: {
             type: String,
@@ -77,34 +86,22 @@ const userSchema = new Schema(
             default: { role: 'member', position: 0, positionName: 'member' },
         },
         otp: {
-            type: String,
-            required: function () {
-                return !this.googleID;
-            },
-        },
-        otpExpires: {
-            type: Date,
-            required: function () {
-                return !this.googleID;
-            },
+            code: String,
+            expires: Date,
         },
         isValid: {
             type: Boolean,
             default: false,
         },
         refreshTokens: {
-            type: [
-                {
-                    Token: String,
-                    expires: Date,
-                },
-            ],
+            type: [refreshTokenSchema],
             default: [],
         },
     },
     { timestamps: true }
 );
 
+// Pre-save hook for password hashing
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
 
@@ -112,32 +109,64 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('refreshTokens')) return next();
+    this.refreshTokens = await this.refreshTokens.filter(
+        (token) => token.expires > Date.now()
+    );
+    next();
+});
+
+// Method to check password correctness
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
+// verify otp
+userSchema.methods.verifyOTP = function (inputOTP) {
+    if (this.otp && this.otp.code === inputOTP) {
+        return true;
+    }
+    return false;
+};
+
+// otp validatetion time
+userSchema.methods.isOTPExpired = function () {
+    if (!this.otp || !this.otp.expires || this.otp.expires <= Date.now()) {
+        return true;
+    }
+    return false;
+};
+
+// Method to generate a refresh token
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.REFRESH_TOKEN_SCRECT,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
-        }
+        { _id: this._id },
+        process.env.REFRESH_TOKEN_SECRET, // Use a different secret for refresh token
+        { expiresIn: process.env.REFRESH_TOKEN_EXPIRE }
     );
 };
 
+// Method to generate an access token
 userSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.ACCESS_TOKEN_SCRECT,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
-        }
-    );
+    return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
+    });
 };
+
+userSchema.methods.generatePasswordToken = function () {
+    return jwt.sign({ _id: this._id }, process.env.PASSWORD_TOKEN_SECRET, {
+        expiresIn: process.env.PASSWORD_TOKEN_EXPIRE,
+    });
+};
+
+// Expire users who haven't validated their accounts after one month
+userSchema.index(
+    { createdAt: 1 },
+    {
+        expireAfterSeconds: MAINTENANCE_DAY * 24 * 60 * 60,
+        partialFilterExpression: { isValid: false },
+    }
+);
 
 export const User = mongoose.model('User', userSchema);
