@@ -20,7 +20,7 @@ router.route('/verify-registration').post(verifyOTPHandler);
 router.route('/login').post(loginHandler);
 router.route('/refresh-token').get(refreshAccessToken);
 router.route('/reset-link/:email').get(forgottenPasswordHandler);
-router.route('/reset-password').post(resetPasswordHandler);
+router.route('/reset-password').patch(resetPasswordHandler);
 // router.route('/reset-password').get()
 
 //secure route

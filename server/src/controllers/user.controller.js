@@ -202,7 +202,7 @@ const getUserInfo = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, 'User data get successfully'));
 });
 
-//update user information
+//reset user password
 const forgottenPasswordHandler = asyncHandler(async (req, res) => {
     const { email } = req.params;
 
