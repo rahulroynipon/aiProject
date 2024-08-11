@@ -24,16 +24,21 @@ const roleSchema = new Schema(
 );
 
 // Define refresh token schema
-const refreshTokenSchema = new Schema({
-    token: {
-        type: String,
-        required: true,
+const refreshTokenSchema = new Schema(
+    {
+        token: {
+            type: String,
+            required: true,
+        },
+        expire: {
+            type: Date,
+            required: true,
+        },
     },
-    expire: {
-        type: Date,
-        required: true,
-    },
-});
+    {
+        _id: false,
+    }
+);
 
 // TTL index on refreshTokenSchema to automatically remove expired tokens
 refreshTokenSchema.index({ expire: 1 }, { expireAfterSeconds: 0 });

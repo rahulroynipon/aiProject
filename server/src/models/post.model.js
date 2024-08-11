@@ -1,5 +1,22 @@
 import mongoose, { Schema } from 'mongoose';
 
+const mediaSchema = new Schema(
+    {
+        url: {
+            type: String,
+            required: true,
+        },
+        type: {
+            type: String,
+            enum: ['image', 'video'],
+            required: true,
+        },
+    },
+    {
+        _id: false,
+    }
+);
+
 const postSchema = new Schema(
     {
         owner: {
@@ -11,7 +28,7 @@ const postSchema = new Schema(
             type: String,
         },
         media: {
-            type: [String],
+            type: [mediaSchema],
             default: [],
         },
     },

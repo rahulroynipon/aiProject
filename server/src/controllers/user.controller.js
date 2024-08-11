@@ -13,6 +13,7 @@ import {
     asyncHandler,
     sendOTP,
     generateOTP,
+    uploadOnCloudinary,
 } from '../utils/utility.js';
 
 // when user registers account manually
@@ -96,7 +97,7 @@ const verifyOTPHandler = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, null, 'OTP verified successfully'));
+        .json(new ApiResponse(201, null, 'OTP verified successfully'));
 });
 
 //when user login account manually
@@ -122,11 +123,11 @@ const loginHandler = asyncHandler(async (req, res) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    const expires = new Date(Date.now() + TOKEN_TIME * 24 * 60 * 60 * 1000);
+    const expire = new Date(Date.now() + TOKEN_TIME * 24 * 60 * 60 * 1000);
 
     user.refreshTokens.push({
         token: refreshToken,
-        expires,
+        expire,
     });
     await user.save({ validateBeforeSave: false });
 
@@ -148,7 +149,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const decodedToken = jwt.verify(
         incomingRefreshToken,
-        process.env.REFRESH_TOKEN_SCRECT
+        process.env.REFRESH_TOKEN_SECRET
     );
 
     const user = await User.findById(decodedToken._id).select('-password');
@@ -300,7 +301,40 @@ const updateUserInfo = asyncHandler(async (req, res) => {
 });
 
 //upload or update avatar and coverImage
-const uploadORchangeIMG = asyncHandler(async (req, res) => {});
+const uploadORchangeIMG = asyncHandler(async (req, res) => {
+    const { key } = req.params;
+    const imageLocalPath = req.file?.path;
+
+    if (!imageLocalPath) {
+        throw new ApiError(400, 'Image file is missing');
+    }
+
+    const Image = await uploadOnCloudinary(imageLocalPath);
+
+    if (!Image.url) {
+        throw new ApiError(400, 'Error while uploading on coverImage');
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                [key]: Image.url,
+            },
+        },
+        {
+            new: true,
+        }
+    ).select(PUBLIC_ITEM);
+
+    if (!user) {
+        throw new ApiError(500, `server site error while uploading the ${key}`);
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, `${key} is uploaded successfully`));
+});
 
 export {
     registrationHandler,
@@ -312,4 +346,5 @@ export {
     forgottenPasswordHandler,
     resetPasswordHandler,
     updateUserInfo,
+    uploadORchangeIMG,
 };
