@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-const commentSchema = new Schema(
+const reactionSchema = new Schema(
     {
         owner: {
             type: Schema.Types.ObjectId,
@@ -21,4 +21,4 @@ const commentSchema = new Schema(
     { timestamps: true }
 );
 
-export const Comment = mongoose.model('Comment', commentSchema);
+export const Comment = mongoose.model('Reaction', reactionSchema);

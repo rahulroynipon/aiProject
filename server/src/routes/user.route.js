@@ -8,6 +8,7 @@ import {
     refreshAccessToken,
     registrationHandler,
     resetPasswordHandler,
+    updateUserInfo,
     verifyOTPHandler,
 } from '../controllers/user.controller.js';
 import { verifyToken } from '../middlewares/Auth.middleware.js';
@@ -21,10 +22,10 @@ router.route('/login').post(loginHandler);
 router.route('/refresh-token').get(refreshAccessToken);
 router.route('/reset-link/:email').get(forgottenPasswordHandler);
 router.route('/reset-password').patch(resetPasswordHandler);
-// router.route('/reset-password').get()
 
 //secure route
 router.route('/logout').get(verifyToken, logoutHandler);
 router.route('/user').get(verifyToken, getUserInfo);
+router.route('/userInfo-update').patch(verifyToken, updateUserInfo);
 
 export default router;
