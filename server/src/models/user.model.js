@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { MAINTENANCE_DAY } from '../constants.js';
 
+// Define role schema
 const roleSchema = new Schema(
     {
         role: {
@@ -22,13 +23,20 @@ const roleSchema = new Schema(
     { _id: false }
 );
 
+// Define refresh token schema
 const refreshTokenSchema = new Schema({
     token: {
         type: String,
-        unique: true,
+        required: true,
     },
-    expires: Date,
+    expire: {
+        type: Date,
+        required: true,
+    },
 });
+
+// TTL index on refreshTokenSchema to automatically remove expired tokens
+refreshTokenSchema.index({ expire: 1 }, { expireAfterSeconds: 0 });
 
 const userSchema = new Schema(
     {
@@ -87,7 +95,11 @@ const userSchema = new Schema(
         },
         otp: {
             code: String,
-            expires: Date,
+            expire: Date,
+        },
+        resetOTP: {
+            code: String,
+            expire: Date,
         },
         isValid: {
             type: Boolean,
@@ -101,19 +113,33 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
-// Pre-save hook for password hashing
+// Pre-save hook for password and OTP hashing
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+    if (this.isModified('password') && this.password) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
+    // Clean up expired refresh tokens
+    if (this.isModified('refreshTokens')) {
+        this.refreshTokens = this.refreshTokens.filter(
+            (token) => token.expire > Date.now()
+        );
+    }
 
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('refreshTokens')) return next();
-    this.refreshTokens = await this.refreshTokens.filter(
-        (token) => token.expires > Date.now()
-    );
+    // Hash OTP code if modified
+    if (this.isModified('otp.code') && this.otp && this.otp.code) {
+        this.otp.code = await bcrypt.hash(this.otp.code, 10);
+    }
+
+    // Hash OTP code if modified
+    if (
+        this.isModified('resetOTP.code') &&
+        this.resetOTP &&
+        this.resetOTP.code
+    ) {
+        this.resetOTP.code = await bcrypt.hash(this.resetOTP.code, 10);
+    }
+
     next();
 });
 
@@ -122,20 +148,28 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
-// verify otp
-userSchema.methods.verifyOTP = function (inputOTP) {
-    if (this.otp && this.otp.code === inputOTP) {
-        return true;
-    }
-    return false;
+// Verify OTP code
+userSchema.methods.isOTPcorrect = async function (inputOTP) {
+    return await bcrypt.compare(inputOTP, this.otp.code);
 };
 
-// otp validatetion time
+// Check if OTP has expired
 userSchema.methods.isOTPExpired = function () {
-    if (!this.otp || !this.otp.expires || this.otp.expires <= Date.now()) {
-        return true;
-    }
-    return false;
+    return !this.otp || !this.otp.expire || Date.now() > this.otp.expire;
+};
+
+// Verify reserOTP code
+userSchema.methods.isresetOTPcorrect = async function (inputOTP) {
+    return await bcrypt.compare(inputOTP, this.resetOTP.code);
+};
+
+// Check if resetOTP has expired
+userSchema.methods.isresetOTPExpired = function () {
+    return (
+        !this.resetOTP ||
+        !this.resetOTP.expire ||
+        Date.now() > this.resetOTP.expire
+    );
 };
 
 // Method to generate a refresh token
@@ -154,6 +188,7 @@ userSchema.methods.generateAccessToken = function () {
     });
 };
 
+// Method to generate a password reset token
 userSchema.methods.generatePasswordToken = function () {
     return jwt.sign({ _id: this._id }, process.env.PASSWORD_TOKEN_SECRET, {
         expiresIn: process.env.PASSWORD_TOKEN_EXPIRE,

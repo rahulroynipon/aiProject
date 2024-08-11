@@ -1,9 +1,10 @@
 import { User } from '../models/user.model.js';
 import {
     COOKIE_OPTIONS,
-    MAINTENANCE_DAY,
     OTP_TIME,
+    PUBLIC_ITEM,
     RESET_TIME,
+    TOKEN_TIME,
 } from './../constants.js';
 import jwt from 'jsonwebtoken';
 import {
@@ -44,7 +45,7 @@ const registrationHandler = asyncHandler(async (req, res) => {
         isValid: false,
     };
 
-    const createdUser = existingUser
+    existingUser
         ? await User.findByIdAndUpdate(existingUser._id, newUser, {
               new: true,
           })
@@ -52,12 +53,15 @@ const registrationHandler = asyncHandler(async (req, res) => {
 
     sendOTP(email, code, 'registration', newUser);
 
+    delete newUser.otp;
+    delete newUser.password;
+
     return res
         .status(200)
         .json(
             new ApiResponse(
                 200,
-                createdUser,
+                newUser,
                 'User created. Verify the OTP sent to your email.'
             )
         );
@@ -77,7 +81,7 @@ const verifyOTPHandler = asyncHandler(async (req, res) => {
     }
 
     // Check OTP validity and expiration
-    if (!user.verifyOTP(otp)) {
+    if (!user.isOTPcorrect(otp)) {
         throw new ApiError(401, 'Invalid OTP');
     }
 
@@ -91,15 +95,8 @@ const verifyOTPHandler = asyncHandler(async (req, res) => {
     await user.save();
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, null, 'OTP verified successfully'));
-
-    // try {
-
-    // } catch (error) {
-    //     console.error('Error during OTP verification:', error);
-    //     throw new ApiError(500, 'Server error during OTP verification');
-    // }
 });
 
 //when user login account manually
@@ -125,7 +122,7 @@ const loginHandler = asyncHandler(async (req, res) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + TOKEN_TIME * 24 * 60 * 60 * 1000);
 
     user.refreshTokens.push({
         token: refreshToken,
@@ -133,9 +130,7 @@ const loginHandler = asyncHandler(async (req, res) => {
     });
     await user.save({ validateBeforeSave: false });
 
-    const loggedInUser = await User.findOne({ email }).select(
-        '-password -refreshTokens'
-    );
+    const loggedInUser = await User.findOne({ email }).select(PUBLIC_ITEM);
 
     return res
         .status(200)
@@ -189,7 +184,7 @@ const logoutHandler = asyncHandler(async (req, res) => {
     }
 
     user.refreshTokens = user.refreshTokens.filter(
-        (item) => item.Token !== refreshToken
+        (item) => item.token !== refreshToken
     );
     await user.save({ validateBeforeSave: false });
 
@@ -200,9 +195,7 @@ const logoutHandler = asyncHandler(async (req, res) => {
 });
 
 const getUserInfo = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).select(
-        'fullname email avatar coverImage batch uniID socialLinks roles'
-    );
+    const user = await User.findById(req.user.id).select(PUBLIC_ITEM);
 
     return res
         .status(200)
@@ -212,7 +205,6 @@ const getUserInfo = asyncHandler(async (req, res) => {
 //update user information
 const forgottenPasswordHandler = asyncHandler(async (req, res) => {
     const { email } = req.params;
-    console.log(email);
 
     if (!email || email.trim() === '') {
         throw new ApiError(400, 'Email is required');
@@ -238,13 +230,46 @@ const forgottenPasswordHandler = asyncHandler(async (req, res) => {
 
     sendOTP(email.trim(), code, 'reset', data);
 
-    user.otp = otp;
+    user.resetOTP = otp;
     await user.save();
     return res
         .status(200)
         .json(
-            new ApiResponse(200, code, ' Verify the OTP sent to your email.')
+            new ApiResponse(200, null, ' Verify the OTP sent to your email.')
         );
+});
+
+const resetPasswordHandler = asyncHandler(async (req, res) => {
+    const { code, token, password } = req.body;
+    console.log(token);
+
+    const decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
+
+    if (!decodedToken) {
+        throw new ApiError(401, 'Invalid credentials');
+    }
+
+    const user = await User.findById(decodedToken._id);
+
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+
+    if (!user.isresetOTPcorrect(code)) {
+        throw new ApiError(401, 'invaild OTP');
+    }
+
+    if (user.isresetOTPExpired()) {
+        throw new ApiError(401, 'expired OTP');
+    }
+
+    user.password = password;
+    user.resetOTP = {};
+    await user.save();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, 'Password successfully reset'));
 });
 
 export {
@@ -255,4 +280,5 @@ export {
     refreshAccessToken,
     getUserInfo,
     forgottenPasswordHandler,
+    resetPasswordHandler,
 };
