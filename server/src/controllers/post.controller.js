@@ -5,6 +5,7 @@ import {
     ApiResponse,
     asyncHandler,
     uploadOnCloudinary,
+    isValidIdentity,
 } from './../utils/utility.js';
 
 const createPostHandler = asyncHandler(async (req, res) => {
@@ -56,7 +57,7 @@ const updatePostHandler = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Post ID is required');
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!isValidIdentity(id)) {
         throw new ApiError(400, 'Invalid post ID');
     }
 
@@ -126,7 +127,7 @@ const deletePostHandler = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Post ID is required');
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!isValidIdentity(id)) {
         throw new ApiError(400, 'Invalid Post ID');
     }
 

@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router
-    .route('/create')
+    .route('/create-post')
     .post(verifyToken, upload.array('media', 20), createPostHandler);
 
 router

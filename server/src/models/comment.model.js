@@ -2,11 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 const commentSchema = new Schema(
     {
-        owner: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
-        },
         postID: {
             type: Schema.Types.ObjectId,
             ref: 'Post',
@@ -17,7 +12,7 @@ const commentSchema = new Schema(
             ref: 'User',
             required: true,
         },
-        content: {
+        comment: {
             type: String,
         },
     },

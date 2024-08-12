@@ -19,11 +19,11 @@ const reactionSchema = new Schema(
         },
         reaction: {
             type: String,
-            enum: ['like', 'love', 'haha', 'wow', 'sad', 'angry'],
+            enum: 'like',
             required: true,
         },
     },
     { timestamps: true }
 );
 
-export const Comment = mongoose.model('Reaction', reactionSchema);
+export const Reaction = mongoose.model('Reaction', reactionSchema);
