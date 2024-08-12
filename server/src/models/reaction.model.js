@@ -12,6 +12,11 @@ const reactionSchema = new Schema(
             ref: 'Post',
             required: true,
         },
+        audiaence: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
         reaction: {
             type: String,
             enum: ['like', 'love', 'haha', 'wow', 'sad', 'angry'],
