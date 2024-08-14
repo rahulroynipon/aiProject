@@ -217,7 +217,7 @@ const forgottenPasswordHandler = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        throw new ApiError(401, 'User is not found');
+        throw new ApiError(404, 'User is not found');
     }
 
     const token = user.generatePasswordToken();

@@ -14,8 +14,12 @@
   @apply py-2 lg:py-2 xxl:py-4;
 }
 
+.trans {
+  @apply transition-all duration-300;
+}
+
 .input {
-  @apply ring-1 ring-black/25 rounded-lg px-4 py-3 md:py-2 xxl:py-3 shadow-sm;
+  @apply ring-1 ring-black/25 rounded-lg shadow-sm px-4  py-3 md:py-2 lg:py-2 xxl:py-3;
 }
 
 .or::before {
