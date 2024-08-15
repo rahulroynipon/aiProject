@@ -40,9 +40,6 @@ const refreshTokenSchema = new Schema(
     }
 );
 
-// TTL index on refreshTokenSchema to automatically remove expired tokens
-refreshTokenSchema.index({ expire: 1 }, { expireAfterSeconds: 0 });
-
 const userSchema = new Schema(
     {
         googleID: {
@@ -164,6 +161,7 @@ userSchema.methods.isOTPExpired = function () {
 
 // Verify reserOTP code
 userSchema.methods.isresetOTPcorrect = async function (inputOTP) {
+    if (!inputOTP || !this.resetOTP.code) return false;
     return await bcrypt.compare(inputOTP, this.resetOTP.code);
 };
 

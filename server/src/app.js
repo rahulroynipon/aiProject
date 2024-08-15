@@ -1,15 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from './passport.js';
 import { LIMIT } from './constants.js';
 
 const app = express();
 
 app.use(
     cors({
-        origin: process.env.CORS_ORIGIN,
+        // origin: process.env.CORS_ORIGIN,
+        origin: 'http://localhost:5173',
         credentials: true,
         optionsSuccessStatus: 200,
     })
@@ -18,18 +17,6 @@ app.use(express.json({ limit: LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: LIMIT }));
 app.use(express.static('public'));
 app.use(cookieParser());
-
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: process.env.NODE_ENV === 'production' },
-    })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 //routes
 import userRouter from './routes/user.route.js';

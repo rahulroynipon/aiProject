@@ -1,7 +1,8 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "../../lib/cn";
 
-const Modal = ({ isOpen, children, onClose }) => {
+const Modal = ({ isOpen, children, onClose, clName }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -21,7 +22,10 @@ const Modal = ({ isOpen, children, onClose }) => {
               stiffness: 300,
               damping: 20,
             }}
-            className="bg-white border border-gray-300 rounded-xl shadow-lg px-8 py-6 max-w-md mx-2"
+            className={cn(
+              "bg-white border border-gray-300 rounded-xl shadow-lg px-8 py-6 max-w-md mx-2",
+              clName
+            )}
           >
             {children}
           </motion.div>

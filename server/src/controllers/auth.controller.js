@@ -1,20 +1,20 @@
-// auth.controller.js
-import passport from 'passport';
+import { User } from '../models/user.model.js';
 import { ApiError, ApiResponse } from '../utils/utility.js';
 
-const googleLoginHandler = passport.authenticate('google', {
-    scope: ['profile', 'email'],
-});
+const googleSignInHandler = async (req, res) => {
+    try {
+        const googleUser = req.googleUser;
+        let user = await User.findOne({ googleID: googleUser.googleID });
 
-const googleCallbackHandler = (req, res) => {
-    passport.authenticate('google', (err, user) => {
-        if (err || !user) {
+        if (!user) {
             return res
-                .status(401)
-                .json(new ApiError(401, 'Authentication failed'));
+                .status(404)
+                .json(
+                    new ApiError(404, 'User not found. Please sign up first.')
+                );
         }
 
-        // Generate JWT tokens here and send them in response
+        // Generate JWT tokens and send them in the response
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
 
@@ -25,10 +25,52 @@ const googleCallbackHandler = (req, res) => {
                 new ApiResponse(
                     200,
                     { user, accessToken, refreshToken },
-                    'Login successful'
+                    'Sign in successful'
                 )
             );
-    })(req, res);
+    } catch (err) {
+        res.status(500).json(new ApiError(500, 'Internal Server Error'));
+    }
 };
 
-export { googleLoginHandler, googleCallbackHandler };
+const googleSignUpHandler = async (req, res) => {
+    try {
+        const googleUser = req.googleUser;
+        let user = await User.findOne({ googleID: googleUser.googleID });
+
+        if (user) {
+            return res
+                .status(409)
+                .json(
+                    new ApiError(409, 'User already exists. Please sign in.')
+                );
+        }
+
+        user = new User({
+            googleID: googleUser.googleID,
+            fullname: googleUser.fullname,
+            email: googleUser.email,
+            avatar: googleUser.avatar,
+        });
+
+        await user.save();
+
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+
+        res.status(201)
+            .cookie('accessToken', accessToken, COOKIE_OPTIONS)
+            .cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
+            .json(
+                new ApiResponse(
+                    201,
+                    { user, accessToken, refreshToken },
+                    'Sign up successful'
+                )
+            );
+    } catch (err) {
+        res.status(500).json(new ApiError(500, 'Internal Server Error'));
+    }
+};
+
+export { googleSignInHandler, googleSignUpHandler };

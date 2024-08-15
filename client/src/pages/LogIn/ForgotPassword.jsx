@@ -25,10 +25,13 @@ export default function ForgotPassword({ isOpen, setOpen }) {
   const [notify, setNotify] = useState(false);
 
   const closeHandler = () => {
-    setOpen(false); // Close the modal
     if (isLoading || isPending) {
-      cancelRequest(); // Cancel ongoing requests
+      cancelRequest();
     }
+    setOpen(false);
+    setErrorMessage("");
+    setSuccessMessage("");
+    setEmail("");
     // Reset state
   };
 

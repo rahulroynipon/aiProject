@@ -4,12 +4,13 @@ import loginImage from "./../../assets/img/login.svg";
 import { useLogin } from "../../hooks/useLogin.js";
 import {
   Button,
-  GoogleLoginButton,
   Modal,
   InputField,
+  Error,
+  OrPartition,
 } from "../../components/component.js";
 import ForgotPassword from "./ForgotPassword.jsx";
-import LoginError from "./LogInError.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const {
@@ -29,19 +30,20 @@ export default function Login() {
   } = useLogin();
 
   const [isForgot, setForgot] = useState(false);
+  const navigate = useNavigate();
 
   const forgotPassHandler = () => {
     setForgot(true);
   };
 
+  const goSignUpHandler = () => {
+    navigate("/signup");
+  };
+
   return (
     <div className="width padding-x">
       <ForgotPassword isOpen={isForgot} setOpen={setForgot} />
-      <LoginError
-        errorMessage={errorMessage}
-        isOpen={isOpen}
-        setOpen={setOpen}
-      />
+      <Error errorMessage={errorMessage} isOpen={isOpen} setOpen={setOpen} />
 
       <div className="flex h-screen items-center justify-center">
         <section className="lg:w-1/2">
@@ -118,31 +120,22 @@ export default function Login() {
                 </Button>
               </form>
 
-              <div className="flex items-center gap-3 my-2 xxl:my-3">
-                <hr className="h-[1px] bg-black/20 border-none w-full" />
-                <span className="text-sm font-semibold opacity-90 shrink-0">
-                  or, Login with
-                </span>
-                <hr className="h-[1px] bg-black/20 border-none w-full" />
-              </div>
+              <OrPartition text={"or, Login with"} />
 
               <section className="flex items-center justify-center">
-                <GoogleLoginButton
-                  onSuccess={(data) =>
-                    console.log("Google login success:", data)
-                  }
-                  onError={(error) => {
-                    setErrorMessage("Google login failed. Please try again.");
-                    setOpen(true);
-                  }}
-                />
+                <Button clName={"input"}>Sign in with google</Button>
               </section>
               <p className="text-center">
                 <span className="opacity-50 text-sm">
                   {" "}
                   Don't have an account?
                 </span>{" "}
-                <span className="underline text-login">Register here</span>
+                <button
+                  onClick={goSignUpHandler}
+                  className="underline text-login"
+                >
+                  Register here
+                </button>
               </p>
             </main>
           </div>

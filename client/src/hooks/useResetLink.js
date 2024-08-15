@@ -15,6 +15,7 @@ export const useResetLink = () => {
         signal: abortControllerRef.current.signal,
       });
     },
+
     onSuccess: (data) => {
       setSuccessMessage("Reset link sent successfully!");
       setErrorMessage(""); // Clear any previous errors
@@ -54,6 +55,7 @@ export const useResetLink = () => {
     isError: mutation.isError,
     error: mutation.error,
     isSuccess: mutation.isSuccess,
+    isPending: mutation.isPending,
     errorMessage,
     successMessage,
     setErrorMessage,

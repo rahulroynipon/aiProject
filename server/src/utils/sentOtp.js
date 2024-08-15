@@ -45,7 +45,7 @@ Competitive Programming Camp City University,
 
 We received a request to reset your password. To proceed, please click the link below to set a new password for your account:
 
-Reset Password Link: ${process.env.WEB_DOMAIN}/${data.code}/${data.token}
+Reset Password Link: ${process.env.WEB_DOMAIN}/reset-password/${data.code}/${data.token}
 
 This link will direct you to a secure page where you can enter and confirm your new password. The link is valid for ${RESET_TIME} minutes, so please use it as soon as possible.
 

@@ -19,7 +19,7 @@
 }
 
 .input {
-  @apply ring-1 ring-black/25 rounded-lg shadow-sm px-4  py-3 md:py-2 lg:py-2 xxl:py-3;
+  @apply rounded-lg shadow-sm px-4  py-3 md:py-2 lg:py-2 xxl:py-3;
 }
 
 .or::before {

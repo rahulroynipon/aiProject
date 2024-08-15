@@ -15,7 +15,9 @@ const Button = ({
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 200, damping: 30 }}
       type={type}
-      className={cn(clName, { "opacity-50 cursor-not-allowed": disabled })}
+      className={cn("ring-1 ring-black/25", clName, {
+        "opacity-50 cursor-not-allowed": disabled,
+      })}
       onClick={onClick}
       disabled={disabled}
       {...props}

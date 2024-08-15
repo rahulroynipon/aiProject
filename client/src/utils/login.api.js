@@ -49,7 +49,7 @@ export const fetchLogin = async ({ email, password }) => {
   }
 };
 
-export const fetchResetPass = async ({ email }) => {
+export const fetchResetPass = async (email) => {
   try {
     const response = await axios.get(`/api/users/reset-link/${email}`, {
       headers: {
@@ -59,7 +59,6 @@ export const fetchResetPass = async ({ email }) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      console.log(error);
       throw {
         status: error.response.status,
         message: error.response.data?.message || "Request failed",

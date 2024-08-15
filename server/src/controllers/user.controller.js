@@ -206,6 +206,7 @@ const getUserInfo = asyncHandler(async (req, res) => {
 //reset user password
 const forgottenPasswordHandler = asyncHandler(async (req, res) => {
     const { email } = req.params;
+    console.log(email);
 
     if (!email || email.trim() === '') {
         throw new ApiError(400, 'Email is required');
@@ -242,7 +243,6 @@ const forgottenPasswordHandler = asyncHandler(async (req, res) => {
 
 const resetPasswordHandler = asyncHandler(async (req, res) => {
     const { code, token, password } = req.body;
-    console.log(token);
 
     const decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
 

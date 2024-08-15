@@ -14,10 +14,6 @@ import {
 } from '../controllers/user.controller.js';
 import { verifyToken } from '../middlewares/Auth.middleware.js';
 import { upload } from '../middlewares/upload.middleware.js';
-import {
-    googleCallbackHandler,
-    googleLoginHandler,
-} from '../controllers/auth.controller.js';
 
 const router = Router();
 
@@ -36,9 +32,5 @@ router.route('/userInfo-update').patch(verifyToken, updateUserInfo);
 router
     .route('/user/upload-image/:key')
     .patch(verifyToken, upload.single('image'), uploadORchangeIMG);
-
-//user with goggle
-router.route('/auth/google').post(googleLoginHandler);
-router.route('/auth/google/callback').post(googleCallbackHandler);
 
 export default router;

@@ -12,11 +12,7 @@ export const useLogin = () => {
   // Mutation configuration
   const mutation = useMutation({
     mutationFn: fetchLogin,
-    onSuccess: (data) => {
-      console.log("Login successful:", data);
-    },
     onError: (error) => {
-      console.error("Login error:", error);
       if (error.status === 401) {
         setErrorMessage("Invalid username or password");
       } else if (error.status) {
@@ -36,8 +32,6 @@ export const useLogin = () => {
     e.preventDefault();
     if (email && password && !mutation.isLoading) {
       mutation.mutate({ email, password });
-    } else {
-      console.error("Please provide both email and password");
     }
   };
 
