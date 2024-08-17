@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleError } from "./handleError";
 
 export const fetchRenewPass = async ({ code, token, password, retype }) => {
   try {
@@ -35,25 +36,6 @@ export const fetchRenewPass = async ({ code, token, password, retype }) => {
 
     return response.data;
   } catch (error) {
-    console.error(error);
-
-    // Handle custom errors
-    if (error.status === 400) {
-      throw error;
-    }
-
-    // Handle Axios errors
-    if (error.response) {
-      throw {
-        status: error.response.status,
-        message: error.response.data?.message || "Request failed",
-      };
-    }
-
-    // Handle network or unexpected errors
-    throw {
-      status: 500,
-      message: "Request failed due to a network error",
-    };
+    handleError(error);
   }
 };

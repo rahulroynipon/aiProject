@@ -21,15 +21,7 @@ export const useResetLink = () => {
       setErrorMessage(""); // Clear any previous errors
     },
     onError: (error) => {
-      if (error.name === "AbortError") {
-        console.log("Request was canceled");
-        return;
-      }
-      if (error.status === 404) {
-        setErrorMessage("User not found");
-      } else {
-        setErrorMessage(error.message);
-      }
+      setErrorMessage(error.message);
       setSuccessMessage(""); // Clear any previous success message
     },
   });

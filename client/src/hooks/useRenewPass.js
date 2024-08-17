@@ -20,18 +20,7 @@ export const useRenewPass = () => {
       setSuccessModal(true);
     },
     onError: (error) => {
-      console.log(error);
-      if (error.status === 400) {
-        setErrorMessage(error.message);
-      } else if (error.status === 401 || error.status === 404) {
-        setErrorMessage("Invalid credentials");
-      } else if (error.status) {
-        setErrorMessage("An unexpected error occurred. Please try again.");
-      } else {
-        setErrorMessage(
-          "An unexpected error occurred. Please check your network connection and try again."
-        );
-      }
+      setErrorMessage(error.message);
       setOpen(true);
     },
   });

@@ -13,17 +13,7 @@ export const useLogin = () => {
   const mutation = useMutation({
     mutationFn: fetchLogin,
     onError: (error) => {
-      if (error.status === 401) {
-        setErrorMessage("Invalid username or password");
-      } else if (error.status) {
-        setErrorMessage(
-          error.message || "An unexpected error occurred. Please try again."
-        );
-      } else {
-        setErrorMessage(
-          "An unexpected error occurred. Please check your network connection and try again."
-        );
-      }
+      setErrorMessage(error.message);
       setOpen(true);
     },
   });

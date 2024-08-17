@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleError } from "./handleError";
 
 export const fetchWithToken = async (url, token) => {
   try {
@@ -25,7 +26,7 @@ export const fetchWithToken = async (url, token) => {
 export const fetchLogin = async ({ email, password }) => {
   try {
     const response = await axios.post(
-      "/api/users/login",
+      "/api/auth/login",
       { email, password },
       {
         headers: {
@@ -35,17 +36,7 @@ export const fetchLogin = async ({ email, password }) => {
     );
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw {
-        status: error.response.status,
-        message: error.response.data?.message || "Login failed",
-      };
-    } else {
-      throw {
-        status: 500,
-        message: "Login failed due to a network error",
-      };
-    }
+    handleError(error);
   }
 };
 
@@ -58,16 +49,6 @@ export const fetchResetPass = async (email) => {
     });
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw {
-        status: error.response.status,
-        message: error.response.data?.message || "Request failed",
-      };
-    } else {
-      throw {
-        status: 500,
-        message: "Request failed due to a network error",
-      };
-    }
+    handleError(error);
   }
 };
