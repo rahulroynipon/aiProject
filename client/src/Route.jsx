@@ -4,37 +4,42 @@ import Login from "./pages/LogIn/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import RenewPass from "./pages/RenewPass/RenewPass";
 import { AnimatePresence } from "framer-motion";
+import { ErrorProvider } from "./Context/Error.context";
+import Error from "./pages/GlobalError";
 
 export default function Render() {
   return (
     <BrowserRouter>
       <AnimatePresence mode="wait">
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <RouteTransition>
-                <Login />
-              </RouteTransition>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <RouteTransition>
-                <SignUp />
-              </RouteTransition>
-            }
-          />
-          <Route
-            path="/reset-password/:code/:token"
-            element={
-              <RouteTransition>
-                <RenewPass />
-              </RouteTransition>
-            }
-          />
-        </Routes>
+        <ErrorProvider>
+          <Error />
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                <RouteTransition>
+                  <Login />
+                </RouteTransition>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <RouteTransition>
+                  <SignUp />
+                </RouteTransition>
+              }
+            />
+            <Route
+              path="/reset-password/:code/:token"
+              element={
+                <RouteTransition>
+                  <RenewPass />
+                </RouteTransition>
+              }
+            />
+          </Routes>
+        </ErrorProvider>
       </AnimatePresence>
     </BrowserRouter>
   );

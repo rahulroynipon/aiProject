@@ -1,42 +1,35 @@
+import { useState } from "react";
+import { useErrorContext } from "../Context/Error.context";
 import { useMutation } from "@tanstack/react-query";
-import { useState, useRef } from "react";
-import { fetchResetPass } from "../utils/login.api";
+import { apiGet } from "../utils/apiAxios.util";
 
-export const useResetLink = () => {
+const useResetLink = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const abortControllerRef = useRef(null);
 
   const mutation = useMutation({
-    mutationFn: ({ email }) => {
-      abortControllerRef.current = new AbortController();
-      return fetchResetPass(email, {
-        signal: abortControllerRef.current.signal,
-      });
+    mutationFn: async ({ email }) => {
+      return await apiGet(`/api/users/reset-link/${email}`);
     },
-
     onSuccess: (data) => {
-      setSuccessMessage("Reset link sent successfully!");
-      setErrorMessage(""); // Clear any previous errors
+      console.log(data);
+      setErrorMessage("");
+      setSuccessMessage(data.message);
     },
     onError: (error) => {
+      setSuccessMessage("");
       setErrorMessage(error.message);
-      setSuccessMessage(""); // Clear any previous success message
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email && email.trim() !== "") {
-      mutation.mutate({ email });
+    if (!email || email.trim() === "") {
+      setErrorMessage("Please enter a valid email address.");
+      return;
     }
-  };
-
-  const cancelRequest = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    mutation.mutate({ email });
   };
 
   return {
@@ -44,14 +37,15 @@ export const useResetLink = () => {
     setEmail,
     handleSubmit,
     isLoading: mutation.isLoading,
+    isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error,
     isSuccess: mutation.isSuccess,
-    isPending: mutation.isPending,
     errorMessage,
     successMessage,
     setErrorMessage,
     setSuccessMessage,
-    cancelRequest,
   };
 };
+
+export default useResetLink;

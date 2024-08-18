@@ -1,49 +1,54 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { fetchLogin, fetchResetPass } from "../utils/login.api";
+import { useErrorContext } from "../Context/Error.context";
+import { apiPost } from "../utils/apiAxios.util";
 
-export const useLogin = () => {
+const useLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isShowPass, setShowPass] = useState(false);
-  const [isOpen, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const { addError } = useErrorContext();
 
-  // Mutation configuration
+  // Mutation for login
   const mutation = useMutation({
-    mutationFn: fetchLogin,
+    mutationFn: async (loginData) => {
+      const { email, password } = loginData;
+      return apiPost("/api/auth/login", { email, password });
+    },
+    onSuccess: (data) => {
+      console.log(data);
+    },
     onError: (error) => {
-      setErrorMessage(error.message);
-      setOpen(true);
+      console.log(error);
+      addError(error.message);
     },
   });
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email && password && !mutation.isLoading) {
-      mutation.mutate({ email, password });
+    if (
+      [email, password].some((field) => !field || field.trim() === "") ||
+      mutation.isPending ||
+      mutation.isLoading
+    ) {
+      return;
     }
+    mutation.mutate({ email, password });
   };
 
   return {
     email,
-    setEmail,
     password,
-    setPassword,
     isShowPass,
-    setShowPass,
     handleSubmit,
+    setEmail,
+    setPassword,
+    setShowPass,
     isLoading: mutation.isLoading,
-    isError: mutation.isError,
-    error: mutation.error,
     isPending: mutation.isPending,
-    isOpen,
-    setOpen,
-    errorMessage,
-    setErrorMessage,
+    isSuccess: mutation.isSuccess,
   };
 };
 
-export const useResetPass = () => {
-  return useMutation(fetchResetPass);
-};
+export default useLogin;

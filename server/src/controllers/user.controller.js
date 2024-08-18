@@ -57,9 +57,7 @@ const forgottenPasswordHandler = asyncHandler(async (req, res) => {
     await user.save();
     return res
         .status(200)
-        .json(
-            new ApiResponse(200, null, ' Verify the OTP sent to your email.')
-        );
+        .json(new ApiResponse(200, null, ' Reset link sent successfully!'));
 });
 
 const resetPasswordHandler = asyncHandler(async (req, res) => {

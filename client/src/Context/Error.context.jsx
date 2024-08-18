@@ -1,31 +1,30 @@
 import React, { createContext, useContext, useState } from "react";
-import { nanoid } from "nanoid";
 
-const ErrorsContext = createContext({
-  errors: [],
-  addError: () => {},
-  removeError: () => {},
-});
+// ErrorsContext without default values as it will be provided by the ErrorProvider
+const ErrorsContext = createContext();
 
 const ErrorProvider = ({ children }) => {
-  const [errors, setErrors] = useState([]);
+  const [error, setError] = useState("");
+  const [isError, setIsError] = useState(false);
 
-  const addError = (errorMessage) => {
-    const newError = { id: nanoid(), error: errorMessage };
-    setErrors((prev) => [...prev, newError]);
+  const addError = (message) => {
+    setError(message);
+    setIsError(true);
   };
 
-  const removeError = (id) => {
-    setErrors((prev) => prev.filter((err) => err.id !== id));
+  const resetError = () => {
+    setError("");
+    setIsError(false);
   };
 
   return (
-    <ErrorsContext.Provider value={{ errors, addError, removeError }}>
+    <ErrorsContext.Provider value={{ error, isError, addError, resetError }}>
       {children}
     </ErrorsContext.Provider>
   );
 };
 
+// Custom hook to use the ErrorsContext
 const useErrorContext = () => useContext(ErrorsContext);
 
-export { ErrorsContext, ErrorProvider, useErrorContext };
+export { ErrorProvider, useErrorContext };

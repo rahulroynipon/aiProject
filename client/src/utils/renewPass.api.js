@@ -1,5 +1,5 @@
 import axios from "axios";
-import { handleError } from "./handleError";
+import { handleError } from "./handleError.util";
 
 export const fetchRenewPass = async ({ code, token, password, retype }) => {
   try {

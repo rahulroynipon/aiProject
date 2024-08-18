@@ -1,38 +1,34 @@
 import Modal from "../../components/Modal";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
-import { useResetLink } from "../../hooks/useResetLink";
 import { RxQuestionMark } from "react-icons/rx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import useResetLink from "./../../hooks/useResetLink";
 
 export default function ForgotPassword({ isOpen, setOpen }) {
   const {
     email,
     setEmail,
     handleSubmit,
-    isError,
     isLoading,
-    isSuccess,
     isPending,
+    isError,
+    error,
+    isSuccess,
     errorMessage,
     successMessage,
     setErrorMessage,
     setSuccessMessage,
-    cancelRequest,
   } = useResetLink();
 
   const [notify, setNotify] = useState(false);
 
   const closeHandler = () => {
-    if (isLoading || isPending) {
-      cancelRequest();
-    }
     setOpen(false);
     setErrorMessage("");
     setSuccessMessage("");
     setEmail("");
-    // Reset state
   };
 
   useEffect(() => {
@@ -42,14 +38,16 @@ export default function ForgotPassword({ isOpen, setOpen }) {
   }, [isError, isSuccess]);
 
   useEffect(() => {
-    setNotify(false);
-    setErrorMessage("");
-    setSuccessMessage("");
-    setEmail("");
+    if (!isOpen) {
+      setNotify(false);
+      setErrorMessage("");
+      setSuccessMessage("");
+      setEmail("");
+    }
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen}>
+    <Modal isOpen={isOpen} onClose={closeHandler}>
       <motion.form
         layout
         onSubmit={handleSubmit}

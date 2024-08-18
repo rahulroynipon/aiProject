@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import logo from "./../../assets/logo/cpccu.png";
 import loginImage from "./../../assets/img/login.svg";
-import { useLogin } from "../../hooks/useLogin.js";
 import {
   Button,
   Modal,
@@ -11,22 +10,20 @@ import {
 } from "../../components/component.js";
 import ForgotPassword from "./ForgotPassword.jsx";
 import { useNavigate } from "react-router-dom";
+import useLogin from "../../hooks/useLogin.js";
 
 export default function Login() {
   const {
     email,
-    setEmail,
     password,
-    setPassword,
     isShowPass,
-    setShowPass,
     handleSubmit,
+    setEmail,
+    setPassword,
+    setShowPass,
     isLoading,
-    isOpen,
-    setOpen,
-    errorMessage,
-    setErrorMessage,
     isPending,
+    isSuccess,
   } = useLogin();
 
   const [isForgot, setForgot] = useState(false);
@@ -43,7 +40,6 @@ export default function Login() {
   return (
     <div className="width padding-x">
       <ForgotPassword isOpen={isForgot} setOpen={setForgot} />
-      <Error errorMessage={errorMessage} isOpen={isOpen} setOpen={setOpen} />
 
       <div className="flex h-screen items-center justify-center">
         <section className="lg:w-1/2">
@@ -116,14 +112,14 @@ export default function Login() {
                   }
                   disabled={isLoading || isPending}
                 >
-                  {isPending ? "Loging..." : "Log in"}
+                  {isPending ? "Logging..." : "Log in"}
                 </Button>
               </form>
 
               <OrPartition text={"or, Login with"} />
 
               <section className="flex items-center justify-center">
-                <Button clName={"input"}>Sign in with google</Button>
+                <Button clName={"input"}>Sign in with Google</Button>
               </section>
               <p className="text-center">
                 <span className="opacity-50 text-sm">
