@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../lib/cn";
 
-const Modal = ({ isOpen, children, onClose, clName }) => {
+const Modal = ({ isOpen, children, onClose, clName, Zindex }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -11,7 +11,10 @@ const Modal = ({ isOpen, children, onClose, clName }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm"
+          className={cn(
+            "fixed inset-0 flex items-center justify-center bg-black/50 z-10 backdrop-blur-sm",
+            Zindex
+          )}
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}

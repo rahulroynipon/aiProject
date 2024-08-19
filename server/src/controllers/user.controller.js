@@ -11,8 +11,6 @@ import {
     ApiError,
     ApiResponse,
     asyncHandler,
-    sendOTP,
-    generateOTP,
     uploadOnCloudinary,
 } from '../utils/utility.js';
 
@@ -22,74 +20,6 @@ const getUserInfo = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, user, 'User data get successfully'));
-});
-
-//reset user password
-const forgottenPasswordHandler = asyncHandler(async (req, res) => {
-    const { email } = req.params;
-    console.log(email);
-
-    if (!email || email.trim() === '') {
-        throw new ApiError(400, 'Email is required');
-    }
-
-    const user = await User.findOne({
-        email,
-        isValid: true,
-    });
-
-    if (!user) {
-        throw new ApiError(404, 'User is not found');
-    }
-
-    const token = user.generatePasswordToken();
-
-    const [otp, code] = generateOTP(RESET_TIME);
-    const data = {
-        fullname: user.fullname,
-        token: token,
-        code: code,
-    };
-
-    sendOTP(email.trim(), code, 'reset', data);
-
-    user.resetOTP = otp;
-    await user.save();
-    return res
-        .status(200)
-        .json(new ApiResponse(200, null, ' Reset link sent successfully!'));
-});
-
-const resetPasswordHandler = asyncHandler(async (req, res) => {
-    const { code, token, password } = req.body;
-
-    const decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
-
-    if (!decodedToken) {
-        throw new ApiError(401, 'Invalid credentials');
-    }
-
-    const user = await User.findById(decodedToken._id);
-
-    if (!user) {
-        throw new ApiError(404, 'User not found');
-    }
-
-    if (!user.isresetOTPcorrect(code)) {
-        throw new ApiError(401, 'invaild OTP');
-    }
-
-    if (user.isresetOTPExpired()) {
-        throw new ApiError(401, 'expired OTP');
-    }
-
-    user.password = password;
-    user.resetOTP = {};
-    await user.save();
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, null, 'Password successfully reset'));
 });
 
 //update user information
@@ -155,10 +85,4 @@ const uploadORchangeIMG = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, `${key} is uploaded successfully`));
 });
 
-export {
-    getUserInfo,
-    forgottenPasswordHandler,
-    resetPasswordHandler,
-    updateUserInfo,
-    uploadORchangeIMG,
-};
+export { getUserInfo, updateUserInfo, uploadORchangeIMG };

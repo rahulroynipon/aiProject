@@ -1,19 +1,28 @@
-import { useState } from "react";
-import { useErrorContext } from "../Context/Error.context";
+// useResetLink.js
+import { useState, useRef, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { apiGet } from "../utils/apiAxios.util";
+import axios from "axios";
+import { apiGetCancel } from "../utils/apiAxios.util"; // Import the utility function
+import { useNetworkConnection } from "../Context/Network.context";
 
 const useResetLink = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { isConnected } = useNetworkConnection();
+
+  const cancelTokenSourceRef = useRef(null);
+
   const mutation = useMutation({
     mutationFn: async ({ email }) => {
-      return await apiGet(`/api/users/reset-link/${email}`);
+      cancelTokenSourceRef.current = axios.CancelToken.source();
+      return await apiGetCancel(
+        `/api/users/reset-link/${email}`,
+        cancelTokenSourceRef.current.token
+      );
     },
     onSuccess: (data) => {
-      console.log(data);
       setErrorMessage("");
       setSuccessMessage(data.message);
     },
@@ -25,11 +34,30 @@ const useResetLink = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email || email.trim() === "") {
+    if (!email || email.trim() === "" || !isConnected) {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
     mutation.mutate({ email });
+  };
+
+  useEffect(() => {
+    if (!isConnected && cancelTokenSourceRef.current) {
+      cancelTokenSourceRef.current.cancel(
+        "Request canceled due to network disconnection."
+      );
+    }
+  }, [isConnected]);
+
+  const resetState = () => {
+    setEmail("");
+    setErrorMessage("");
+    setSuccessMessage("");
+    if (cancelTokenSourceRef.current) {
+      cancelTokenSourceRef.current.cancel(
+        "Previous operation canceled by you."
+      );
+    }
   };
 
   return {
@@ -45,6 +73,7 @@ const useResetLink = () => {
     successMessage,
     setErrorMessage,
     setSuccessMessage,
+    resetState, // Export resetState function
   };
 };
 

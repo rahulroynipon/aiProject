@@ -5,9 +5,9 @@ import {
   Button,
   Modal,
   InputField,
-  Error,
   OrPartition,
 } from "../../components/component.js";
+import { RxReload } from "react-icons/rx";
 import ForgotPassword from "./ForgotPassword.jsx";
 import { useNavigate } from "react-router-dom";
 import useLogin from "../../hooks/useLogin.js";
@@ -112,7 +112,16 @@ export default function Login() {
                   }
                   disabled={isLoading || isPending}
                 >
-                  {isPending ? "Logging..." : "Log in"}
+                  {isLoading || isPending ? (
+                    <div className="flex items-center justify-center gap-2 ">
+                      <span className=" animate-spin">
+                        <RxReload />
+                      </span>
+                      <span>Logging...</span>
+                    </div>
+                  ) : (
+                    "Log in"
+                  )}
                 </Button>
               </form>
 

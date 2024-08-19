@@ -14,40 +14,34 @@ export default function ForgotPassword({ isOpen, setOpen }) {
     isLoading,
     isPending,
     isError,
-    error,
     isSuccess,
     errorMessage,
     successMessage,
-    setErrorMessage,
-    setSuccessMessage,
+    resetState,
   } = useResetLink();
 
   const [notify, setNotify] = useState(false);
 
   const closeHandler = () => {
+    resetState();
     setOpen(false);
-    setErrorMessage("");
-    setSuccessMessage("");
-    setEmail("");
   };
 
   useEffect(() => {
     if (isError || isSuccess) {
-      setNotify(true); // Trigger notification display
+      setNotify(true);
     }
   }, [isError, isSuccess]);
 
   useEffect(() => {
     if (!isOpen) {
       setNotify(false);
-      setErrorMessage("");
-      setSuccessMessage("");
-      setEmail("");
+      resetState(); // Reset state if modal closes unexpectedly
     }
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={closeHandler}>
+    <Modal isOpen={isOpen} onClose={closeHandler} Zindex="z-30">
       <motion.form
         layout
         onSubmit={handleSubmit}
@@ -94,7 +88,6 @@ export default function ForgotPassword({ isOpen, setOpen }) {
           </Button>
         </div>
 
-        {/* Display status messages */}
         <AnimatePresence>
           {notify && (
             <motion.div

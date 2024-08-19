@@ -4,21 +4,23 @@ import React, { createContext, useContext, useState } from "react";
 const ErrorsContext = createContext();
 
 const ErrorProvider = ({ children }) => {
-  const [error, setError] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [isAnyError, setAnyError] = useState(false);
+  const [anyErrorMessage, setAnyErrorMessage] = useState("");
 
   const addError = (message) => {
-    setError(message);
-    setIsError(true);
+    setAnyError(true);
+    setAnyErrorMessage(message);
   };
 
   const resetError = () => {
-    setError("");
-    setIsError(false);
+    setAnyError(false);
+    setAnyErrorMessage("");
   };
 
   return (
-    <ErrorsContext.Provider value={{ error, isError, addError, resetError }}>
+    <ErrorsContext.Provider
+      value={{ isAnyError, anyErrorMessage, addError, resetError }}
+    >
       {children}
     </ErrorsContext.Provider>
   );

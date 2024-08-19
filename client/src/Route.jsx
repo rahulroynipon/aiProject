@@ -4,42 +4,48 @@ import Login from "./pages/LogIn/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import RenewPass from "./pages/RenewPass/RenewPass";
 import { AnimatePresence } from "framer-motion";
-import { ErrorProvider } from "./Context/Error.context";
-import Error from "./pages/GlobalError";
+import { useNetworkConnection } from "./Context/Network.context";
+import { useEffect } from "react";
+import { useErrorContext } from "./Context/Error.context";
 
 export default function Render() {
+  const { isConnected } = useNetworkConnection();
+  const { addError } = useErrorContext();
+
+  useEffect(() => {
+    if (!isConnected) {
+      addError("No internet connection. Please check your network settings.");
+    }
+  }, [isConnected]);
   return (
     <BrowserRouter>
       <AnimatePresence mode="wait">
-        <ErrorProvider>
-          <Error />
-          <Routes>
-            <Route
-              path="/login"
-              element={
-                <RouteTransition>
-                  <Login />
-                </RouteTransition>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <RouteTransition>
-                  <SignUp />
-                </RouteTransition>
-              }
-            />
-            <Route
-              path="/reset-password/:code/:token"
-              element={
-                <RouteTransition>
-                  <RenewPass />
-                </RouteTransition>
-              }
-            />
-          </Routes>
-        </ErrorProvider>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <RouteTransition>
+                <Login />
+              </RouteTransition>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <RouteTransition>
+                <SignUp />
+              </RouteTransition>
+            }
+          />
+          <Route
+            path="/reset-password/:code/:token"
+            element={
+              <RouteTransition>
+                <RenewPass />
+              </RouteTransition>
+            }
+          />
+        </Routes>
       </AnimatePresence>
     </BrowserRouter>
   );

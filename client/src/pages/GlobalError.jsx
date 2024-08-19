@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../components/Modal"; // Assuming you have a Modal component
-import Button from "../components/Button"; // Assuming you have a Button component
-import { CiCircleAlert } from "react-icons/ci";
+import { TfiClose } from "react-icons/tfi";
 import { useErrorContext } from "../Context/Error.context";
 
 export default function ErrorModal() {
-  const { error, isError, resetError } = useErrorContext();
+  const { isAnyError, anyErrorMessage, resetError } = useErrorContext();
   const [isOpen, setOpen] = useState(false);
 
   useEffect(() => {
-    if (isError) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
-  }, [isError]);
+    setOpen(isAnyError);
+  }, [isAnyError]);
 
   const closeError = () => {
     resetError(); // Resets the error in context
@@ -23,26 +18,27 @@ export default function ErrorModal() {
 
   return (
     <Modal
-      isOpen={isOpen && !!error} // Open the modal only if there's an error
-      onClose={closeError} // Call closeError when the modal is closed
-      clName={"min-w-[15rem] max-w-[20rem]"}
+      isOpen={isOpen}
+      onClose={closeError}
+      clName="min-w-[15rem] max-w-[20rem] p-5 z-50"
+      Zindex="z-50"
     >
-      <section className="flex flex-col items-center justify-center gap-3 ">
-        <div className="text-red-500 flex flex-col items-center justify-center">
-          <CiCircleAlert size={100} />
+      <section className="flex flex-col items-center justify-center gap-3 text-center">
+        <div className="text-red-500 bg-red-200 rounded-full p-3">
+          <TfiClose size={24} />
         </div>
 
-        <p className="max-w-[20rem] font-thin text-center">
-          {error} {/* Display the error message */}
-        </p>
+        <div>
+          <h3 className="text-lg uppercase font-semibold">Error</h3>
+          <p className="text-sm text-gray-700">{anyErrorMessage}</p>
+        </div>
 
-        <Button
-          onClick={closeError} // Close the modal on click
-          whileHover={{ scale: 1.1 }}
-          clName={"ring-red-400 px-3 py-1 rounded font-semibold text-red-500"}
+        <button
+          onClick={closeError}
+          className="text-red-500 hover:text-white ring-1 ring-red-500 mt-2 py-1 px-2 rounded hover:bg-red-300 trans"
         >
           OK
-        </Button>
+        </button>
       </section>
     </Modal>
   );

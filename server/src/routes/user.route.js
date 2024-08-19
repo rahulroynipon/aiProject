@@ -1,9 +1,7 @@
 import { Router } from 'express';
 
 import {
-    forgottenPasswordHandler,
     getUserInfo,
-    resetPasswordHandler,
     updateUserInfo,
     uploadORchangeIMG,
 } from '../controllers/user.controller.js';
@@ -12,8 +10,6 @@ import { upload } from '../middlewares/upload.middleware.js';
 
 const router = Router();
 
-router.route('/reset-link/:email').get(forgottenPasswordHandler);
-router.route('/reset-password').patch(resetPasswordHandler);
 //secure route
 router.route('/user').get(verifyToken, getUserInfo);
 router.route('/userInfo-update').patch(verifyToken, updateUserInfo);

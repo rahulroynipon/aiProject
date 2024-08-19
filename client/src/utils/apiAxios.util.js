@@ -41,4 +41,13 @@ const apiDelete = async (url) => {
   }
 };
 
-export { apiGet, apiPost, apiPatch, apiDelete };
+const apiGetCancel = async (url, cancelToken) => {
+  try {
+    const response = await axios.get(url, { cancelToken });
+    return response.data;
+  } catch (error) {
+    throw handleError(error);
+  }
+};
+
+export { apiGet, apiPost, apiPatch, apiDelete, apiGetCancel };

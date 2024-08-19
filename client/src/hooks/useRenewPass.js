@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchRenewPass } from "../utils/renewPass.api";
+import { useErrorContext } from "../Context/Error.context";
+import { apiPatch } from "../utils/apiAxios.util";
 
 export const useRenewPass = () => {
   const [password, setPassword] = useState("");
@@ -8,28 +9,36 @@ export const useRenewPass = () => {
   const [code, setCode] = useState("");
   const [token, setToken] = useState("");
   const [isShowPass, setShowPass] = useState(false);
-  const [isOpen, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [successModal, setSuccessModal] = useState(false);
 
+  const { addError } = useErrorContext();
+
   const mutation = useMutation({
-    mutationFn: fetchRenewPass,
-    onSuccess: (data) => {
+    mutationFn: async ({ code, token, password }) => {
+      return await apiPatch(`/api/users/reset-password`, {
+        code,
+        token,
+        password,
+        retype,
+      });
+    },
+    onSuccess: () => {
       setSuccessMessage("Password updated successfully");
       setSuccessModal(true);
     },
     onError: (error) => {
-      setErrorMessage(error.message);
-      setOpen(true);
+      addError(error.message);
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password && retype) {
-      mutation.mutate({ code, token, password, retype });
+    if (!password || !retype) {
+      return;
     }
+
+    mutation.mutate({ code, token, password, retype });
   };
 
   return {
@@ -43,10 +52,6 @@ export const useRenewPass = () => {
     setToken,
     isShowPass,
     setShowPass,
-    isOpen,
-    setOpen,
-    errorMessage,
-    setErrorMessage,
     successMessage,
     setSuccessMessage,
     isError: mutation.isError,

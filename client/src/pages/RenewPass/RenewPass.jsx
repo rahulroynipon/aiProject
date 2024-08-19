@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import loginImage from "./../../assets/img/login.svg";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { MdLockReset } from "react-icons/md";
 import { useRenewPass } from "../../hooks/useRenewPass";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import Error from "../../components/Error";
 import { SlCheck } from "react-icons/sl";
 import resetIMG from "./../../assets/img/reset.png";
 
@@ -20,11 +18,6 @@ export default function RenewPass() {
     setToken,
     isShowPass,
     setShowPass,
-    isOpen,
-    setOpen,
-    errorMessage,
-    successMessage,
-    isError,
     isSuccess,
     isPending,
     isLoading,
@@ -58,10 +51,6 @@ export default function RenewPass() {
 
   return (
     <div className="width padding-x">
-      {isOpen && (
-        <Error isOpen={isOpen} setOpen={setOpen} errorMessage={errorMessage} />
-      )}
-
       {isSuccess && (
         <Modal isOpen={successModal}>
           <section className="flex flex-col gap-4 items-center justify-center">

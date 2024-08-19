@@ -13,7 +13,6 @@ import {
     asyncHandler,
     sendOTP,
     generateOTP,
-    uploadOnCloudinary,
 } from '../utils/utility.js';
 
 // when user registers account manually
@@ -195,10 +194,91 @@ const logoutHandler = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, 'User logged out successfully'));
 });
 
+//reset user password
+const forgottenPasswordHandler = asyncHandler(async (req, res) => {
+    const { email } = req.params;
+    console.log(email);
+
+    if (!email || email.trim() === '') {
+        throw new ApiError(400, 'Email is required');
+    }
+
+    const user = await User.findOne({
+        email,
+        isValid: true,
+    });
+
+    if (!user) {
+        throw new ApiError(404, 'User is not found');
+    }
+
+    const token = user.generatePasswordToken();
+
+    const [otp, code] = generateOTP(RESET_TIME);
+    const data = {
+        fullname: user.fullname,
+        token: token,
+        code: code,
+    };
+
+    sendOTP(email.trim(), code, 'reset', data);
+
+    user.resetOTP = otp;
+    await user.save();
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, ' Reset link sent successfully!'));
+});
+
+const resetPasswordHandler = asyncHandler(async (req, res) => {
+    const { code, token, password, retype } = req.body;
+
+    if (password !== retype) {
+        throw new ApiError(400, 'Passwords do not match.');
+    }
+
+    if (password.length < 6) {
+        throw new ApiError(400, 'Password must be at least 6 characters long.');
+    }
+
+    const decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
+
+    if (!decodedToken) {
+        throw new ApiError(401, 'Invalid credentials');
+    }
+
+    const user = await User.findById(decodedToken._id);
+
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+
+    if (!user.isresetOTPcorrect(code)) {
+        throw new ApiError(401, 'invaild OTP');
+    }
+
+    if (user.isresetOTPExpired()) {
+        throw new ApiError(
+            401,
+            'The OTP has expired. Please request a new one'
+        );
+    }
+
+    user.password = password;
+    user.resetOTP = {};
+    await user.save();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, 'Password successfully reset'));
+});
+
 export {
     registrationHandler,
     verifyOTPHandler,
     loginHandler,
     refreshAccessToken,
     logoutHandler,
+    forgottenPasswordHandler,
+    resetPasswordHandler,
 };
