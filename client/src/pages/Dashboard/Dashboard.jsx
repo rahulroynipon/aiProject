@@ -1,3 +1,5 @@
 export default function Dashborad() {
-  return <main></main>;
+  return <div>
+    
+  </div> ;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "./../../assets/logo/cpccu.png";
 import loginImage from "./../../assets/img/login.svg";
 import { Button, InputField, OrPartition } from "../../components/component.js";
@@ -31,6 +31,12 @@ export default function Login() {
   const goSignUpHandler = () => {
     navigate("/signup");
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/profile");
+    }
+  }, [isSuccess]);
 
   return (
     <div className="width padding-x">

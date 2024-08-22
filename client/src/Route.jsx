@@ -7,6 +7,9 @@ import { AnimatePresence } from "framer-motion";
 import { useNetworkConnection } from "./Context/Network.context";
 import { useEffect } from "react";
 import { useErrorContext } from "./Context/Error.context";
+import router from "./../../server/src/routes/user.route";
+import Dashborad from "./pages/Dashboard/Dashboard";
+// import ProtectedRoute from "./components/Protected";
 
 export default function Render() {
   const { isConnected } = useNetworkConnection();
@@ -45,6 +48,15 @@ export default function Render() {
               </RouteTransition>
             }
           />
+
+          {/* <ProtectedRoute
+            path="/profile"
+            component={
+              <RouteTransition>
+                <Dashborad />
+              </RouteTransition>
+            }
+          /> */}
         </Routes>
       </AnimatePresence>
     </BrowserRouter>
