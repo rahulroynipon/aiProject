@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import logo from "./../../assets/logo/cpccu.png";
 import loginImage from "./../../assets/img/login.svg";
-import {
-  Button,
-  Modal,
-  InputField,
-  OrPartition,
-} from "../../components/component.js";
+import { Button, InputField, OrPartition } from "../../components/component.js";
 import { RxReload } from "react-icons/rx";
 import ForgotPassword from "./ForgotPassword.jsx";
 import { useNavigate } from "react-router-dom";
@@ -108,7 +103,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   clName={
-                    "bg-login text-white w-full rounded py-2 mt-2 font-semibold"
+                    "bg-login hover:bg-login/95 text-white w-full rounded py-2 mt-2 font-semibold"
                   }
                   disabled={isLoading || isPending}
                 >

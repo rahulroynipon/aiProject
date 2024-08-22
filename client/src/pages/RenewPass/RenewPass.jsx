@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
 import { SlCheck } from "react-icons/sl";
 import resetIMG from "./../../assets/img/reset.png";
+import { motion } from "framer-motion";
 
 export default function RenewPass() {
   const {
@@ -77,7 +78,12 @@ export default function RenewPass() {
         />
 
         <section className="lg:w-1/2">
-          <div className="lg:max-w-[23.5rem] xxl:max-w-[25rem] mx-auto flex flex-col gap-5 xxl:gap-7  p-5 md:border md:rounded-xl md:shadow-xl md:shadow-login/20">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="lg:max-w-[23.5rem] xxl:max-w-[25rem] mx-auto flex flex-col gap-5 xxl:gap-7  p-5 md:border md:rounded-xl md:shadow-xl md:shadow-login/20"
+          >
             <div className="flex items-center justify-center">
               <div className="text-white bg-login rounded-full p-1">
                 <MdLockReset size={45} />
@@ -94,7 +100,10 @@ export default function RenewPass() {
             </header>
 
             <main className="flex flex-col gap-5">
-              <form
+              <motion.form
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-3 xxl:gap-5"
               >
@@ -135,14 +144,16 @@ export default function RenewPass() {
                 </div>
                 <Button
                   type="submit"
-                  clName={"input mt-2 bg-login text-white font-semibold"}
+                  clName={
+                    "input mt-2 bg-login hover:bg-login/95 text-white font-semibold"
+                  }
                   disabled={isLoading || isPending}
                 >
                   {isLoading || isPending ? "Submitting..." : "Submit"}
                 </Button>
-              </form>
+              </motion.form>
             </main>
-          </div>
+          </motion.div>
         </section>
       </div>
     </div>

@@ -16,7 +16,7 @@ export const useRenewPass = () => {
 
   const mutation = useMutation({
     mutationFn: async ({ code, token, password }) => {
-      return await apiPatch(`/api/users/reset-password`, {
+      return await apiPatch(`/api/auth/reset-password`, {
         code,
         token,
         password,

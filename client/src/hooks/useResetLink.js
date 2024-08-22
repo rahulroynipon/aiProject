@@ -18,7 +18,7 @@ const useResetLink = () => {
     mutationFn: async ({ email }) => {
       cancelTokenSourceRef.current = axios.CancelToken.source();
       return await apiGetCancel(
-        `/api/users/reset-link/${email}`,
+        `/api/auth/reset-link/${email}`,
         cancelTokenSourceRef.current.token
       );
     },

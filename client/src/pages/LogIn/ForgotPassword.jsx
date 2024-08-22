@@ -81,7 +81,7 @@ export default function ForgotPassword({ isOpen, setOpen }) {
           </Button>
           <Button
             type="submit"
-            clName="input bg-login text-white font-semibold shrink-0 w-1/2"
+            clName="input bg-login hover:bg-login/95 text-white font-semibold shrink-0 w-1/2"
             disabled={isLoading || isPending}
           >
             {isPending ? "Sending..." : "Send link"}

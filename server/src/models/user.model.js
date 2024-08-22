@@ -151,12 +151,15 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 
 // Verify OTP code
 userSchema.methods.isOTPcorrect = async function (inputOTP) {
+    if (!this.otp || !this.otp.code) return false;
+    // Hash the inputOTP to compare with the stored OTP code
     return await bcrypt.compare(inputOTP, this.otp.code);
 };
 
 // Check if OTP has expired
 userSchema.methods.isOTPExpired = function () {
-    return !this.otp || !this.otp.expire || Date.now() > this.otp.expire;
+    if (!this.otp || !this.otp.expire) return true;
+    return Date.now() > new Date(this.otp.expire).getTime();
 };
 
 // Verify reserOTP code
@@ -167,11 +170,8 @@ userSchema.methods.isresetOTPcorrect = async function (inputOTP) {
 
 // Check if resetOTP has expired
 userSchema.methods.isresetOTPExpired = function () {
-    return (
-        !this.resetOTP ||
-        !this.resetOTP.expire ||
-        Date.now() > this.resetOTP.expire
-    );
+    if (!this.resetOTP || !this.resetOTP.expire) return true; // Assume expired if no expiry date
+    return Date.now() > this.resetOTP.expire;
 };
 
 // Method to generate a refresh token

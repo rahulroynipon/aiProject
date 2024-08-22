@@ -17,7 +17,8 @@ import {
 
 // when user registers account manually
 const registrationHandler = asyncHandler(async (req, res) => {
-    const { email, fullname, batch, password, uniID } = req.body;
+    const { email, fullname, batch, password, confirm_password, uniID } =
+        req.body;
 
     if (
         [email, fullname, batch, password, uniID].some(
@@ -25,6 +26,14 @@ const registrationHandler = asyncHandler(async (req, res) => {
         )
     ) {
         throw new ApiError(400, 'All fields are required');
+    }
+
+    if (password !== confirm_password) {
+        throw new ApiError(400, 'Passwords do not match');
+    }
+
+    if (password.length < 6) {
+        throw new ApiError(400, 'Password must be at least 6 characters long.');
     }
 
     const existingUser = await User.findOne({ email });
@@ -81,18 +90,21 @@ const verifyOTPHandler = asyncHandler(async (req, res) => {
     }
 
     // Check OTP validity and expiration
-    if (!user.isOTPcorrect(otp)) {
+    const isOtpCorrect = await user.isOTPcorrect(otp);
+    const isOtpExpired = user.isOTPExpired();
+
+    if (!isOtpCorrect) {
         throw new ApiError(401, 'Invalid OTP');
     }
 
-    if (user.isOTPExpired()) {
+    if (isOtpExpired) {
         throw new ApiError(419, 'OTP has expired');
     }
 
     // Update user to set OTP as verified
     user.isValid = true;
     user.otp = {}; // Clear OTP field
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     return res
         .status(201)
@@ -241,9 +253,10 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Password must be at least 6 characters long.');
     }
 
-    const decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
-
-    if (!decodedToken) {
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(token, process.env.PASSWORD_TOKEN_SECRET);
+    } catch (error) {
         throw new ApiError(401, 'Invalid credentials');
     }
 
@@ -253,11 +266,14 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
         throw new ApiError(404, 'User not found');
     }
 
-    if (!user.isresetOTPcorrect(code)) {
+    const isresetOTPcorrect = await user.isresetOTPcorrect(code);
+    const isresetOTPExpired = await user.isresetOTPExpired();
+
+    if (!isresetOTPcorrect) {
         throw new ApiError(401, 'invaild OTP');
     }
 
-    if (user.isresetOTPExpired()) {
+    if (isresetOTPExpired) {
         throw new ApiError(
             401,
             'The OTP has expired. Please request a new one'

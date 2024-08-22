@@ -1,5 +1,6 @@
 const handleError = (error) => {
   if (error.response) {
+    console.log(error);
     throw {
       status: error.response.status,
       message: error.response.data.message || "Something went wrong",

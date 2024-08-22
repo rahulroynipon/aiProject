@@ -18,7 +18,12 @@ const InputField = ({
         {label} {required && label && <span className="text-red-500">*</span>}
       </label>
       <input
-        className={cn("input ring-1 ring-black/25", { "bg-red-200": isError })}
+        className={cn("input ring-1 ring-black/25", {
+          "bg-red-200": isError,
+          "opacity-50 cursor-not-allowed": type == "submit" && disabled,
+          "bg-gray-200 border-gray-400 text-gray-500 cursor-not-allowed":
+            disabled,
+        })}
         type={type}
         id={id}
         placeholder={placeholder}

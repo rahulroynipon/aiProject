@@ -21,7 +21,7 @@ const sendOTP = (email, otp, purpose, data = {}) => {
         },
     });
 
-    let subject, text;
+    let subject, text, html;
 
     if (purpose === 'registration') {
         subject = 'Your Registration OTP Code';
@@ -41,17 +41,41 @@ Competitive Programming Camp City University,
 `;
     } else if (purpose === 'reset') {
         subject = 'Your Password Reset OTP Code';
-        text = `Dear ${data.fullname},
-
-We received a request to reset your password. To proceed, please click the link below to set a new password for your account:
-
-Reset Password Link: ${process.env.WEB_DOMAIN}/reset-password/${data.code}/${data.token}
-
-This link will direct you to a secure page where you can enter and confirm your new password. The link is valid for ${RESET_TIME} minutes, so please use it as soon as possible.
-
-Best regards,
-Competitive Programming Camp City University,
-(CPCCU)`;
+        html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+    <style>
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #007bff;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <p>Dear ${data.fullname},</p>
+    <p>We received a request to reset your password. To proceed, please click the button below to set a new password for your account:</p>
+    <a href="${process.env.WEB_DOMAIN}/reset-password/${data.code}/${data.token}" class="button" target="_blank">Reset Password</a>
+    <p>This link will direct you to a secure page where you can enter and confirm your new password. The link is valid for ${RESET_TIME} minutes, so please use it as soon as possible.</p>
+    <p>Best regards,<br>
+    Competitive Programming Camp City University,<br>
+    (CPCCU)</p>
+</body>
+</html>
+`;
     } else {
         throw new Error('Invalid purpose specified for OTP email.');
     }
@@ -61,6 +85,7 @@ Competitive Programming Camp City University,
         to: email,
         subject: subject,
         text: text,
+        html: html,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

@@ -21,7 +21,9 @@ const Button = ({
       }}
       type={type}
       className={cn("ring-1 ring-black/25 input ", clName, {
-        "opacity-50 cursor-not-allowed": disabled,
+        "opacity-50 cursor-not-allowed": type == "submit" && disabled,
+        "opacity-50 cursor-not-allowed bg-gray-300 border-gray-400 text-gray-500":
+          disabled && type != "submit",
       })}
       onClick={onClick}
       disabled={disabled}
