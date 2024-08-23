@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { MdLockReset } from "react-icons/md";
-import resetIMG from "./../../assets/img/reset.png";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { RxReload } from "react-icons/rx";
+import Logo from "./../../assets/logo/cpccu.png";
+import signUp from "./../../assets/img/signUp.jpg";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import OrPartition from "../../components/OrPartition";
-import { motion } from "framer-motion";
-import Logo from "./../../assets/logo/cpccu.png";
-import { useNavigate } from "react-router-dom";
-import signUp from "./../../assets/img/signUp.jpg";
 import { useRegistration } from "../../hooks/useRegistration";
-import { RxReload } from "react-icons/rx";
 import VerifyOTP from "./VerifyOTP";
 
+// Input field information for each page
 const inputFieldInfo = [
   [
     {
@@ -45,13 +44,13 @@ const inputFieldInfo = [
     {
       label: "Password",
       id: "password",
-      type: "password", // Changed to password for security
+      type: "password",
       placeholder: "Type your password",
     },
     {
       label: "Confirm Password",
       id: "confirm_password",
-      type: "password", // Changed to password for security
+      type: "password",
       placeholder: "Confirm your password",
     },
   ],
@@ -70,6 +69,7 @@ export default function RenewPass() {
     isSuccess,
   } = useRegistration();
 
+  // Handle input changes
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormValues((prevValues) => ({
@@ -78,6 +78,12 @@ export default function RenewPass() {
     }));
   };
 
+  // Navigate to login page
+  const goLogin = () => {
+    navigate("/login");
+  };
+
+  // Handle form submission for each page step
   const handleNext = (e) => {
     e.preventDefault();
     if (pageNumber < inputFieldInfo.length - 1) {
@@ -85,16 +91,14 @@ export default function RenewPass() {
     }
   };
 
+  // Handle back button click
   const handleBack = () => {
     if (pageNumber > 0) {
       setPageNumber(pageNumber - 1);
     }
   };
 
-  const goLogin = () => {
-    navigate("/login");
-  };
-
+  // Open OTP verification modal when registration is successful
   useEffect(() => {
     if (isSuccess) {
       setOpen(true);
@@ -103,7 +107,9 @@ export default function RenewPass() {
 
   return (
     <div className="width padding-x">
+      {/* OTP Verification Modal */}
       <VerifyOTP isOpen={isOpen} setOpen={setOpen} mail={formValues?.email} />
+
       <div className="flex h-screen items-center justify-center">
         <section className="lg:w-1/2">
           <motion.div
@@ -112,10 +118,12 @@ export default function RenewPass() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Logo */}
             <div className="flex items-center justify-center mb-2">
               <img className="h-20 md:h-16 lg:h-14" src={Logo} alt="cpccu" />
             </div>
 
+            {/* Header */}
             <header className="flex flex-col items-center mb-4">
               <h1 className="text-2xl font-bold opacity-70">Sign Up</h1>
               <h2 className="opacity-70 xxl:text-lg text-center">
@@ -123,10 +131,13 @@ export default function RenewPass() {
               </h2>
             </header>
 
+            {/* Google Sign-Up Button */}
             <Button>Sign up with Google</Button>
 
+            {/* Or partition */}
             <OrPartition clName="mb-3 mt-4" text="or" />
 
+            {/* Form Inputs */}
             <main className="flex flex-col gap-5">
               <CustomInputForSignUp
                 data={inputFieldInfo[pageNumber]}
@@ -141,6 +152,7 @@ export default function RenewPass() {
               />
             </main>
 
+            {/* Footer */}
             <footer className="mt-6 text-center text-sm text-gray-600">
               Already have an account?{" "}
               <span
@@ -153,6 +165,7 @@ export default function RenewPass() {
           </motion.div>
         </section>
 
+        {/* Sign-Up Image */}
         <section className="w-1/2 hidden lg:block">
           <img src={signUp} alt="Sign Up" />
         </section>
@@ -161,6 +174,7 @@ export default function RenewPass() {
   );
 }
 
+// Custom Input Component for Sign-Up Form
 const CustomInputForSignUp = ({
   data,
   pageNumber,
@@ -180,6 +194,7 @@ const CustomInputForSignUp = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Render input fields */}
       {data?.map((item, index) => (
         <InputField
           key={index}
@@ -192,6 +207,8 @@ const CustomInputForSignUp = ({
           required
         />
       ))}
+
+      {/* Navigation buttons */}
       <div
         className={`${
           pageNumber === 0 ? "justify-end" : "justify-between"
@@ -206,6 +223,7 @@ const CustomInputForSignUp = ({
             <span className="font-semibold">Back</span>
           </Button>
         )}
+
         {pageNumber !== inputFieldInfo.length - 1 && (
           <Button
             clName={`${
@@ -216,6 +234,7 @@ const CustomInputForSignUp = ({
             <span className="font-semibold">Next</span>
           </Button>
         )}
+
         {pageNumber === inputFieldInfo.length - 1 && (
           <Button
             type="submit"

@@ -15,9 +15,7 @@ const useLogin = () => {
       const { email, password } = loginData;
       return apiPost("/api/auth/login", { email, password });
     },
-    onSuccess: (data) => {
-      console.log(data);
-    },
+    onSuccess: (data) => {},
     onError: (error) => {
       console.log(error);
       addError(error.message);

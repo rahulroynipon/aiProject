@@ -1,23 +1,17 @@
 import React from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
-
+// Utility function to check if the user is authenticated
 const isAuthenticated = () => {
   const token = Cookies.get("accessToken");
+  console.log(token);
   return !!token;
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        isAuthenticated() ? <Component {...props} /> : <Redirect to="/login" />
-      }
-    />
-  );
+const ProtectedRoute = ({ element }) => {
+  return isAuthenticated() ? element : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

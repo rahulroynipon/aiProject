@@ -6,7 +6,7 @@ import {
     asyncHandler,
     uploadOnCloudinary,
     isValidIdentity,
-} from './../utils/utility.js';
+} from '../utils/utility.js';
 
 const createPostHandler = asyncHandler(async (req, res) => {
     const { caption } = req.body;
