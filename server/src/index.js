@@ -13,6 +13,10 @@ connectDB()
         app.on('error', () => {
             console.log('Connection failed');
         });
+
+        app.listen(port, () => {
+            console.log('The portal hosted at port:', port);
+        });
     })
     .catch((error) => {
         console.log('MONGODB connection is failed', error);
