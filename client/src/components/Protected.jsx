@@ -1,17 +1,15 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import { useAuthContext } from "../Context/Auth.context";
 
-// Utility function to check if the user is authenticated
-const isAuthenticated = () => {
-  const token = Cookies.get("accessToken");
-  console.log(token);
-  return !!token;
-};
-
-// Protected Route Component
 const ProtectedRoute = ({ element }) => {
-  return isAuthenticated() ? element : <Navigate to="/login" />;
+  const { logStatus, isLoading, isPending } = useAuthContext();
+
+  if (isLoading || isPending) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
+
+  return logStatus ? element : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

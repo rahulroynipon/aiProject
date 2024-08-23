@@ -56,7 +56,7 @@ const inputFieldInfo = [
   ],
 ];
 
-export default function RenewPass() {
+export default function SignUp() {
   const [isOpen, setOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(0); // Page index
   const navigate = useNavigate();

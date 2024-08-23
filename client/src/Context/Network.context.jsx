@@ -9,7 +9,6 @@ const NetworkProvider = ({ children }) => {
 
   useEffect(() => {
     setConnected(isOnline);
-    console.log(isOnline);
   }, [isOnline]);
 
   return (
