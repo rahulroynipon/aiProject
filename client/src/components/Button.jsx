@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 
 import { motion } from "framer-motion";
 import cn from "../../lib/cn";
+=======
+import React from "react";
+import { cn } from "../../lib/cn";
+import { motion } from "framer-motion";
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 
 const Button = ({
   type = "button",

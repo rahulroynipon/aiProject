@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
 body {
   scroll-behavior: smooth;
 }
@@ -21,6 +22,8 @@ body {
   @apply md:text-lg lg:text-[1.1rem] leading-7;
 }
 
+=======
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 .width {
   @apply max-w-full lg:max-w-[1350px] xxl:max-w-[1600px] mx-auto;
 }
@@ -33,6 +36,12 @@ body {
   @apply py-2 lg:py-2 xxl:py-4;
 }
 
+<<<<<<< HEAD
+=======
+.trans {
+  @apply transition-all duration-300;
+}
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 
 .input {
   @apply rounded-lg shadow-sm px-4  py-3 md:py-2 lg:py-2 xxl:py-3;
@@ -59,4 +68,8 @@ body {
   position: absolute;
   right: 0px;
   top: 14px;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4

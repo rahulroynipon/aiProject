@@ -121,8 +121,12 @@ const sendOTP = (email, otp, purpose, data = {}) => {
         </html>
         `;
     } else if (purpose === 'reset') {
+<<<<<<< HEAD
         subject = 'Password Reset Request';
         text = `Dear ${data.fullname},\n\nWe received a request to reset your password. Click the link below to set a new password.\n\nBest regards,\nCompetitive Programming Camp City University (CPCCU)`;
+=======
+        subject = 'Your Password Reset OTP Code';
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
         html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -131,6 +135,7 @@ const sendOTP = (email, otp, purpose, data = {}) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Reset</title>
     <style>
+<<<<<<< HEAD
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
@@ -155,6 +160,11 @@ const sendOTP = (email, otp, purpose, data = {}) => {
         .button {
             display: inline-block;
             padding: 15px 25px;
+=======
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
             font-size: 16px;
             color: #ffffff;
             background-color: #007bff;
@@ -162,6 +172,7 @@ const sendOTP = (email, otp, purpose, data = {}) => {
             border-radius: 5px;
             text-align: center;
             font-weight: bold;
+<<<<<<< HEAD
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .button:hover {
@@ -180,10 +191,16 @@ const sendOTP = (email, otp, purpose, data = {}) => {
         }
         .footer a:hover {
             text-decoration: underline;
+=======
+            border: 1px solid #007bff;
+            cursor: pointer;
+            margin: 10px 0;
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <div class="container">
         <div class="header">
             <img src="https://res.cloudinary.com/dua4uga2s/image/upload/f_auto,q_auto/alxvgtkggfbv1e3y5fsy" alt="CPCCU Logo">
@@ -198,6 +215,15 @@ const sendOTP = (email, otp, purpose, data = {}) => {
             <a href="${process.env.WEB_DOMAIN}" target="_blank">Visit our website</a>
         </div>
     </div>
+=======
+    <p>Dear ${data.fullname},</p>
+    <p>We received a request to reset your password. To proceed, please click the button below to set a new password for your account:</p>
+    <a href="${process.env.WEB_DOMAIN}/reset-password/${data.code}/${data.token}" class="button" target="_blank">Reset Password</a>
+    <p>This link will direct you to a secure page where you can enter and confirm your new password. The link is valid for ${RESET_TIME} minutes, so please use it as soon as possible.</p>
+    <p>Best regards,<br>
+    Competitive Programming Camp City University,<br>
+    (CPCCU)</p>
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 </body>
 </html>
 `;

@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import cn from "../../lib/cn";
 
+=======
+import { cn } from "../../lib/cn";
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 
 export default function OrPartition({ text, clName }) {
   return (

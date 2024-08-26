@@ -13,11 +13,17 @@ const verifyToken = asyncHandler(async (req, res, next) => {
     }
 
     try {
+<<<<<<< HEAD
         // Verify the access token
         const verifiedToken = jwt.verify(
             accessToken,
             process.env.ACCESS_TOKEN_SECRET
         );
+=======
+        const Token =
+            req.cookies?.accessToken ||
+            req.header('Authorization')?.replace('Bearer ', '');
+>>>>>>> 7a6c11d8aa51212c43914995b5451fcdc55dc0d4
 
         // Fetch the user associated with the token
         const existedUser = await User.findById(verifiedToken._id).select(
